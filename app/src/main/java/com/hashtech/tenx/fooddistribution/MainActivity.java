@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView.Adapter adapter;
     private List<CustomDataType> listItems;
 
-    public static String username = "";
+    public static String email = "";
     private FirebaseAuth mAuth;
     Button btnLogut,btnSell;
     TextView tvheader;
@@ -81,9 +81,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(currentUser == null){
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
+            finish();
         }else {
+            email = currentUser.getEmail();
+            userDoc = db.collection("users").document(email);
             tvheader.setText(currentUser.getEmail());
-            userDoc = db.collection("users").document(currentUser.getEmail());
+
         }
 
 
@@ -110,6 +113,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         NavigationView navView = findViewById(R.id.nav_view);
+        View headerView = navView.getHeaderView(0);
+
+        tvheader = headerView.findViewById(R.id.tv_email);
+
         navView.setNavigationItemSelectedListener(this);
 
 
@@ -120,10 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         listItems = new ArrayList<>();
 
-        username = getIntent().getStringExtra("username");
-        btnLogut = findViewById(R.id.btn_signout);
 
-        tvheader = findViewById(R.id.tv_header);
 
         postRef = db.collection("posts");
         postRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -132,12 +136,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
                     List<CustomDataType> list = new ArrayList<>();
                     for(DocumentSnapshot s : docs){
-                        String name = s.getString("name");
+                        String name = s.getString("tvEmail");
                         String addr = s.getString("address");
-                        String contact = s.getString("contact");
+                        String contact = s.getString("tvContact");
                         String days = s.getString("days");
                         String details = s.getString("details");
-                        String time = s.getString("time");
+                        String time = s.getString("tvTime");
                         String timestamp = s.getString("timestamp");
                         String email = s.getString("email");
                         String id = s.getId();
@@ -154,22 +158,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        btnLogut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signOut();
-                currentUser = null;
-                Intent i = new Intent(MainActivity.this, LogInActivity.class);
-                startActivity(i);
-            }
-        });
-        btnSell = findViewById(R.id.btn_sell);
-        btnSell.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sellDialog(MainActivity.this);
-            }
-        });
 
 
 
@@ -201,12 +189,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String time = etTime.getText().toString();
                 String days = etDays.getText().toString();
                 final Map<String, String> data = new HashMap<>();
-                data.put("name", name);
+                data.put("tvEmail", name);
                 data.put("email", currentUser.getEmail());
                 data.put("address", address);
-                data.put("contact", contact);
+                data.put("tvContact", contact);
                 data.put("details", details);
-                data.put("time", time);
+                data.put("tvTime", time);
                 data.put("days", days);
                 data.put("timestamp", ""+System.currentTimeMillis());
                 postRef.document().set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -252,9 +240,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()){
             case R.id.nav_share:
                 Toast.makeText(this, "Sharing", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_logout:
+                logout();
+                break;
+            case R.id.nav_sell:
+                drawer.closeDrawer(GravityCompat.START);
+                sellDialog(MainActivity.this);
+            case R.id.nav_orderrequests:
+                goToOrderRequests("requests");
+                break;
+            case R.id.nav_myorders:
+                goToOrderRequests("myorders");
+                break;
+
         }
         drawer.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+
+    public void logout(){
+        mAuth.signOut();
+        currentUser = null;
+        Intent i = new Intent(MainActivity.this, LogInActivity.class);
+        startActivity(i);
+    }
+
+
+    public void goToOrderRequests(String flag){
+        Intent i = new Intent(MainActivity.this, OrderActivity.class);
+        i.putExtra("flag", flag);
+        startActivity(i);
+
     }
 }

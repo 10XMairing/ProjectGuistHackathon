@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".LogInActivity" />
-
+        <activity android:name=".PlaceOrderActivity" />
+        <activity android:name=".OrderActivity"></activity>
     </application>
 
 </manifest>

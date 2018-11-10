@@ -14,19 +14,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> {
 
 
     private List<CustomDataType> list;
     private Context context;
 
-    public RecyclerViewAdapter(Context context) {
+    public OrderAdapter(Context context) {
         this.context = context;
         list = new ArrayList<>();
     }
 
 
-    public RecyclerViewAdapter(List<CustomDataType> list, Context context) {
+    public OrderAdapter(List<CustomDataType> list, Context context) {
         this.list = list;
         this.context = context;
     }
@@ -34,7 +34,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_row,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_row,parent,false);
 
 
         return new ViewHolder(v);
@@ -49,23 +49,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.dayTextView.setText(data.getDay());
         holder.timeTextView.setText(data.getTime());
         holder.surplusTextView.setText(data.getSurplus());
-
-
-        holder.requestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(context, PlaceOrderActivity.class);
-                i.putExtra("tvEmail", data.getNameOfSupplier());
-                i.putExtra("address", data.getAddress());
-                i.putExtra("tvContact", data.getPhone());
-                i.putExtra("tvDay",data.getDay() );
-                i.putExtra("tvTime", data.getTime());
-                i.putExtra("surplus", data.getSurplus());
-                i.putExtra("email", data.getEmail());
-                i.putExtra("id", data.getId());
-                context.startActivity(i);
-            }
-        });
+        holder.tvEmail.setText(data.getBuyerEmail());
 
     }
 
@@ -76,7 +60,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView nameTextView,phoneTextView,addressTextView,dayTextView,timeTextView,surplusTextView;
+        public TextView nameTextView,phoneTextView,addressTextView,dayTextView,timeTextView,surplusTextView, tvEmail;
         public Button requestButton;
 
 
@@ -89,18 +73,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             timeTextView = itemView.findViewById(R.id.timeTextView);
             dayTextView = itemView.findViewById(R.id.dayTextView);
             surplusTextView = itemView.findViewById(R.id.surplusTextView);
-            requestButton = itemView.findViewById(R.id.requestButton);
+            tvEmail = itemView.findViewById(R.id.tv_o_email);
 
         }
     }
-    public void insertAndRefresh(CustomDataType data){
-        if(list == null){
-            list = new ArrayList<>();
-            list.add(data);
-            notifyDataSetChanged();
-        }else {
-            list.add(data);
-            notifyDataSetChanged();
-        }
-    }
+
 }
