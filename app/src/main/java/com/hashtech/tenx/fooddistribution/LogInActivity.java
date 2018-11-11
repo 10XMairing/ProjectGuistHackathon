@@ -1,5 +1,6 @@
 package com.hashtech.tenx.fooddistribution;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -79,6 +80,9 @@ public class LogInActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final ProgressDialog pd = new ProgressDialog(LogInActivity.this);
+                pd.setMessage("loading..");
+                pd.show();
                 final String name = etUsername.getText().toString();
                 String pass = etPassword.getText().toString();
                 final String email = etEmail.getText().toString();
@@ -98,6 +102,7 @@ public class LogInActivity extends AppCompatActivity {
 
                                         Toast.makeText(context, "New User Created!", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
+                                        pd.dismiss();
                                     }
                                 });
                             }
@@ -106,6 +111,7 @@ public class LogInActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(context, "Error, Try again!", Toast.LENGTH_SHORT).show();
+                            pd.dismiss();
                         }
                     });
                 }
@@ -118,16 +124,21 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void logIn(View view){
+        final ProgressDialog pd = new ProgressDialog(LogInActivity.this);
+        pd.setMessage("loading..");
+        pd.show();
         final String email = et_username.getText().toString();
         String password = et_password.getText().toString();
            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                @Override
                public void onComplete(@NonNull Task<AuthResult> task) {
+                   pd.dismiss();
                    goNextActivity();
                }
            }).addOnFailureListener(new OnFailureListener() {
                @Override
                public void onFailure(@NonNull Exception e) {
+                   pd.dismiss();
                    Toast.makeText(LogInActivity.this, "Error, Try again", Toast.LENGTH_SHORT).show();
                }
            });

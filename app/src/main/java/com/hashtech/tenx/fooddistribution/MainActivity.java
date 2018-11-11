@@ -1,7 +1,10 @@
 package com.hashtech.tenx.fooddistribution;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -95,10 +99,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         setContentView(R.layout.navigation_activity);
         db = FirebaseFirestore.getInstance();
         collRef = db.collection("users");
         mAuth = FirebaseAuth.getInstance();
+
 
         //nav
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
@@ -145,8 +151,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         String timestamp = s.getString("timestamp");
                         String email = s.getString("email");
                         String id = s.getId();
-
-
                         CustomDataType data = new CustomDataType(name, email, contact, addr, days, time, details, timestamp, id);
                         list.add(data);
                     }
@@ -164,8 +168,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void sellDialog(Context context){
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomDialog);
+        Rect displayRectangle = new Rect();
+        Window window = ((Activity)context).getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
         View  v = LayoutInflater.from(context).inflate(R.layout.dialog_seller, null, false);
+        v.setMinimumWidth((int)(displayRectangle.width() * 0.95f));
+        v.setMinimumHeight((int)(displayRectangle.height() * 0.95f));
         builder.setView(v);
         final AlertDialog dialog = builder.create();
         dialog.show();
@@ -182,6 +191,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final ProgressDialog pd = new ProgressDialog(MainActivity.this);
+                pd.setMessage("Loading..");
+                pd.show();
                 String name = etname.getText().toString();
                 String address = etaddress.getText().toString();
                 String contact = etcontact.getText().toString();
@@ -202,10 +214,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(MainActivity.this, "Done", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+                        pd.dismiss();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        pd.dismiss();
                         Toast.makeText(MainActivity.this, "Failed, Try again!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -239,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.nav_share:
-                Toast.makeText(this, "Sharing", Toast.LENGTH_SHORT).show();
+
                 break;
             case R.id.nav_logout:
                 logout();
@@ -247,11 +261,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_sell:
                 drawer.closeDrawer(GravityCompat.START);
                 sellDialog(MainActivity.this);
+                break;
             case R.id.nav_orderrequests:
                 goToOrderRequests("requests");
                 break;
             case R.id.nav_myorders:
                 goToOrderRequests("myorders");
+                break;
+            case R.id.nav_offers:
+                Intent i = new Intent(MainActivity.this, OffersActivity.class);
+                startActivity(i);
                 break;
 
         }

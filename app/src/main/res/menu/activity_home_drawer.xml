@@ -3,16 +3,20 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_sell"
-            android:title="Sell" />
+            android:icon="@drawable/euro"
+            android:title="Supply" />
         <item
             android:id="@+id/nav_myorders"
+            android:icon="@drawable/shopping"
             android:title="My Orders" />
         <item
             android:id="@+id/nav_orderrequests"
+            android:icon="@drawable/notifyoff"
             android:title="Order Requests" />
         <item
-            android:id="@+id/nav_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_offers"
+            android:title="Special Offers"
+            android:icon="@drawable/bargains"/>
     </group>
 
     <item android:title="Communicate">

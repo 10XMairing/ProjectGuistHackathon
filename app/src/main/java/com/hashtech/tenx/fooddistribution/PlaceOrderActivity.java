@@ -1,5 +1,6 @@
 package com.hashtech.tenx.fooddistribution;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -53,13 +55,13 @@ public class PlaceOrderActivity extends AppCompatActivity {
         final String email = i.getStringExtra("email");
         final String surplus = i.getStringExtra("surplus");
         final String id = i.getStringExtra("id");
-        tvName.setText(name);
-        tvSurplus.setText(surplus);
-        tvAddr.setText(addr);
-        tvContact.setText(contact);
-        tvDay.setText(day);
-        tvTime.setText(time);
-        tvEmail.setText(email);
+        tvName.setText("Name : "+name);
+        tvSurplus.setText("Surplus : "+surplus);
+        tvAddr.setText("Addr : "+addr);
+        tvContact.setText("Contact : "+contact);
+        tvDay.setText("Day : "+day);
+        tvTime.setText("Time : "+time);
+        tvEmail.setText("Email : "+email);
         Log.d("TEST", ""+MainActivity.email);
         db = FirebaseFirestore.getInstance();
 
@@ -69,29 +71,50 @@ public class PlaceOrderActivity extends AppCompatActivity {
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Map<String, String> data = new HashMap<>();
+               if(!email.equals(MainActivity.email)){
+                   final ProgressDialog pd = new ProgressDialog(PlaceOrderActivity.this);
+                   pd.setMessage("loading..");
+                   pd.show();
+                   Map<String, String> data = new HashMap<>();
 
-                data.put("email", email);
-                data.put("address", addr);
-                data.put("contact", contact);
-                data.put("surplus", surplus);
-                data.put("buyerid", MainActivity.email);
+                   data.put("email", email);
+                   data.put("address", addr);
+                   data.put("contact", contact);
+                   data.put("surplus", surplus);
+                   data.put("buyerid", MainActivity.email);
 
-                suplierRef.collection("requests").document(id).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                   suplierRef.collection("requests").document(id).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                       @Override
+                       public void onComplete(@NonNull Task<Void> task) {
 
-                    }
-                });
+                       }
+                   }).addOnFailureListener(new OnFailureListener() {
+                       @Override
+                       public void onFailure(@NonNull Exception e) {
+                           pd.dismiss();
 
-                recieverRef.collection("myorders").document(id).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(PlaceOrderActivity.this, "Order Placed", Toast.LENGTH_SHORT).show();
-                        Intent i = new Intent(PlaceOrderActivity.this, MainActivity.class);
-                        startActivity(i);
-                    }
-                });
+                       }
+                   });
+
+                   recieverRef.collection("myorders").document(id).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                       @Override
+                       public void onComplete(@NonNull Task<Void> task) {
+                           pd.dismiss();
+                           Toast.makeText(PlaceOrderActivity.this, "Order Placed", Toast.LENGTH_SHORT).show();
+                           Intent i = new Intent(PlaceOrderActivity.this, MainActivity.class);
+
+                           startActivity(i);
+
+                       }
+                   }).addOnFailureListener(new OnFailureListener() {
+                       @Override
+                       public void onFailure(@NonNull Exception e) {
+                           pd.dismiss();
+                       }
+                   });
+               }else {
+                   Toast.makeText(PlaceOrderActivity.this, "You cannot send an order to yourself", Toast.LENGTH_SHORT).show();
+               }
 
             }
         });

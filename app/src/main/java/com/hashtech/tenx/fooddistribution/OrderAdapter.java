@@ -2,6 +2,7 @@ package com.hashtech.tenx.fooddistribution;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -44,13 +45,19 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final CustomDataType data = list.get(position);
         holder.nameTextView.setText(data.getNameOfSupplier());
-        holder.addressTextView.setText(data.getAddress());
-        holder.phoneTextView.setText(data.getPhone());
-        holder.dayTextView.setText(data.getDay());
-        holder.timeTextView.setText(data.getTime());
-        holder.surplusTextView.setText(data.getSurplus());
+        holder.addressTextView.setText("Address : "+data.getAddress());
+        holder.phoneTextView.setText("Contact : "+data.getPhone());
+        holder.dayTextView.setVisibility(View.GONE);
+        holder.timeTextView.setVisibility(View.GONE);
+        holder.surplusTextView.setText("Surplus : "+data.getSurplus());
         holder.tvEmail.setText(data.getBuyerEmail());
-
+        holder.requestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:"+data.getPhone()));
+                context.startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -74,7 +81,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
             dayTextView = itemView.findViewById(R.id.dayTextView);
             surplusTextView = itemView.findViewById(R.id.surplusTextView);
             tvEmail = itemView.findViewById(R.id.tv_o_email);
-
+            requestButton = itemView.findViewById(R.id.btn_confirm);
         }
     }
 

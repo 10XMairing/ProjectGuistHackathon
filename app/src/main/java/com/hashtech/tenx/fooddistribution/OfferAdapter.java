@@ -2,6 +2,7 @@ package com.hashtech.tenx.fooddistribution;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,58 +12,47 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-
-
+public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder>{
     private List<CustomDataType> list;
     private Context context;
 
-    public RecyclerViewAdapter(Context context) {
+    public OfferAdapter(Context context) {
         this.context = context;
         list = new ArrayList<>();
     }
 
 
-    public RecyclerViewAdapter(List<CustomDataType> list, Context context) {
+    public OfferAdapter(List<CustomDataType> list, Context context) {
         this.list = list;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_row,parent,false);
+    public OfferAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.offer_row,parent,false);
 
 
-        return new ViewHolder(v);
+        return new OfferAdapter.ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull OfferAdapter.ViewHolder holder, int position) {
         final CustomDataType data = list.get(position);
         holder.nameTextView.setText(data.getNameOfSupplier());
         holder.addressTextView.setText("Address : "+data.getAddress());
         holder.phoneTextView.setText("Contact : "+data.getPhone());
         holder.dayTextView.setText("Day : "+data.getDay());
         holder.timeTextView.setText("Time : "+data.getTime());
-        holder.surplusTextView.setText("Quantity : "+data.getSurplus());
+        holder.surplusTextView.setText("Discount : "+data.getSurplus());
 
 
         holder.requestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(context, PlaceOrderActivity.class);
-                i.putExtra("tvEmail", data.getNameOfSupplier());
-                i.putExtra("address", data.getAddress());
-                i.putExtra("tvContact", data.getPhone());
-                i.putExtra("tvDay",data.getDay() );
-                i.putExtra("tvTime", data.getTime());
-                i.putExtra("surplus", data.getSurplus());
-                i.putExtra("email", data.getEmail());
-                i.putExtra("id", data.getId());
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:"+data.getPhone()));
                 context.startActivity(i);
             }
         });
@@ -103,4 +93,5 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             notifyDataSetChanged();
         }
     }
+
 }

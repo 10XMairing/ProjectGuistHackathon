@@ -47,6 +47,16 @@ public class CustomDataType {
         this.buyerEmail = buyerEmail;
     }
 
+    public CustomDataType(String nameOfSupplier, String email, String phone, String address, String day, String time, String surplus) {
+        this.nameOfSupplier = nameOfSupplier;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.day = day;
+        this.time = time;
+        this.surplus = surplus;
+    }
+
     public String getNameOfSupplier() {
         return nameOfSupplier;
     }
